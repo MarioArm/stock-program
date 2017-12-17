@@ -21,15 +21,16 @@ import javax.validation.constraints.NotNull;
 @Table(name = "lotes")
 public class Lote implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
-
 	
 	@NotNull
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="codigo_de_barras")
-	private Producto producto;
+	@JoinColumn(name="bar_code")
+	private CodigoDeBarra barCode;
 
 	@NotEmpty
 	private String lote;
@@ -51,8 +52,6 @@ public class Lote implements Serializable {
 	public Lote(){
 		
 	}
-	
-	private static final long serialVersionUID = 1L;
 
 	public long getId() {
 		return id;
@@ -62,12 +61,12 @@ public class Lote implements Serializable {
 		this.id = id;
 	}
 
-	public Producto getProducto() {
-		return producto;
+	public CodigoDeBarra getBarCode() {
+		return barCode;
 	}
 
-	public void setProducto(Producto producto) {
-		this.producto = producto;
+	public void setBarCode(CodigoDeBarra barCode) {
+		this.barCode = barCode;
 	}
 
 	public String getLote() {
@@ -108,6 +107,5 @@ public class Lote implements Serializable {
 
 	public void setCantidad(int cantidad) {
 		this.cantidad = cantidad;
-	}
-
+	}	
 }

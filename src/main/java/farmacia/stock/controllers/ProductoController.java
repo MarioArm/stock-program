@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import farmacia.stock.models.entity.CodigoDeBarra;
 import farmacia.stock.models.entity.Counter;
 import farmacia.stock.models.entity.Lote;
 import farmacia.stock.models.entity.Producto;
@@ -30,7 +31,8 @@ import farmacia.stock.services.StockService;
 // del objeto cargado.
 @SessionAttributes("Counter")
 public class ProductoController {
-
+	
+	
 	@Autowired
 	private StockService stockService;
 
@@ -65,7 +67,7 @@ public class ProductoController {
 		model.addAttribute("Titulo", "Captura de stock");
 		model.addAttribute("Productos", stockService.getAllProductsShortDescription());
 		model.addAttribute("Counter", new Counter());
-
+		
 		return "products/stock";
 	}
 
@@ -97,15 +99,16 @@ public class ProductoController {
 		List<Producto> productos = stockService.getAllProductsShortDescription();
 		
 		for(Producto producto: productos) {
-			if(producto.isLowStock() && (producto.cantidadPorSurtir()>0)) {
-				productosPorMostrar.add(producto);
-			}
+//			if(producto.isLowStock() && (producto.cantidadPorSurtir()>0)) {
+//				productosPorMostrar.add(producto);
+//			}
 		}		
 		
 		model.addAttribute("Productos", productosPorMostrar);
 		model.addAttribute("Counter", new Counter());
 
-		return "products/generacionPedido";
+		//return "products/generacionPedido";
+		return "redirect:/";
 	}
 	
 

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import farmacia.stock.models.entity.OrderStockHeader;
 import farmacia.stock.models.entity.Producto;
 
 public interface IStockService{
@@ -24,4 +25,6 @@ public interface IStockService{
 	public List<Producto> getAllProductsShortDescription();
 	
 	public Producto findById(String codigoDeBarras);
+	
+	public OrderStockHeader generateOrderToStock();
 }

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/layout :: head"></head>
+<body>
+	<header th:replace="layout/layout :: header"></header>
+	<div class="container">
+
+		<h1
+			class="text-secondary text-center border border-left-0 border-right-0 border-top-0 border-success"
+			th:text="${Titulo}">Productos</h1>
+
+		<form th:action="@{/products/stock/update}" method="post">
+			<table
+				class="table table-fit2 table-sm table-striped table-hover mx-auto "
+				style="width: 70%">
+				<thead class="thead-dark">
+					<tr>
+						<th class="col-1 text-center" scope="col">#</th>
+						<th class="col-2" scope="col">Clave PBI</th>
+						<th class="col-6" scope="col">Descripci&oacute;n</th>
+						<th class="col-3" scope="col">Stock Minimo</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="Producto : ${Productos}">
+						<td class="text-center" th:text="${Counter.sumAndGet(1)}"></td>
+						<td th:text="${Producto.clavePBI}"></td>
+						<td th:text="${Producto.descripcion}"></td>
+						<td><input th:name="${Producto.codigoDeBarras}" type="number"
+							th:value="${Producto.stockMinimo}"></td>
+					</tr>
+				</tbody>
+			</table>
+			<input type="submit" value="Guardar" class="btn btn-lg btn-primary">
+			<a th:href="@{/products/productos}" class="btn btn-lg btn-secondary">
+				Cancelar</a>
+		</form>
+	</div>
+
+
+	<footer th:replace="layout/layout :: footer"></footer>
+</body>
+</html>
