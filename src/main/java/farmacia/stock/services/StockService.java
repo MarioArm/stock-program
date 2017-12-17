@@ -1,6 +1,9 @@
 package farmacia.stock.services;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import farmacia.stock.models.dao.ICodigoDeBarraDao;
 import farmacia.stock.models.dao.ILoteDao;
+import farmacia.stock.models.dao.IOrderStockHeaderDao;
 import farmacia.stock.models.dao.IProductoDao;
+import farmacia.stock.models.entity.CodigoDeBarra;
+import farmacia.stock.models.entity.Lote;
+import farmacia.stock.models.entity.OrderStockHeader;
 import farmacia.stock.models.entity.Producto;
 
 @Service
@@ -20,7 +28,11 @@ public class StockService implements IStockService {
 	@Autowired
 	private ILoteDao loteDao;
 	@Autowired
+	private ICodigoDeBarraDao barCodeDao;
+	@Autowired
 	private IExcelStorageService excelStorage;
+	@Autowired
+	private IOrderStockHeaderDao stockHeaderDao;
 
 	@Override
 	@Transactional
@@ -64,8 +76,9 @@ public class StockService implements IStockService {
 	@Transactional
 	public void importExcelFile(MultipartFile file) throws IOException {
 		excelStorage.storeExcelFile(file);
+		barCodeDao.deleteAll();
 		loteDao.deleteAll();
-		excelStorage.readExcelFile(productoDao);
+		excelStorage.readExcelFile(productoDao,barCodeDao);
 
 	}
 
@@ -74,8 +87,10 @@ public class StockService implements IStockService {
 	public List<Producto> getAllProductsShortDescription() {
 		List<Producto> productos = (List<Producto>) productoDao.findAll();
 		for (Producto producto : productos) {
-			if (producto.getDescripcion().length() > 40) {
-				producto.setDescripcion(producto.getDescripcion().substring(0, 39));
+			for(CodigoDeBarra barCode: producto.getBarCodes()) {
+				if (barCode.getDescription().length() > 40) {
+					barCode.setDescription(barCode.getDescription().substring(0, 39));
+				}				
 			}
 		}
 		return productos;
@@ -83,7 +98,31 @@ public class StockService implements IStockService {
 
 	@Override
 	public Producto findById(String codigoDeBarras) {
-		return productoDao.findById(codigoDeBarras).get();
+		CodigoDeBarra codigoDelProducto = barCodeDao.findById(codigoDeBarras).get();
+		
+		return codigoDelProducto.getProducto();
+	}
+
+	@Override
+	public OrderStockHeader generateOrderToStock() {
+		List<Producto> allProducts = (List<Producto>) productoDao.findAll();
+		List<Producto> lowStockProducts = new ArrayList<>();
+		
+		OrderStockHeader stockHeader = new OrderStockHeader();
+		stockHeader.setElaborationDate(Date.from(Instant.now()));
+		
+		for(Producto producto : allProducts) {
+			int quantityInStock = 0;
+			for(CodigoDeBarra barCode : producto.getBarCodes()) {
+				for(Lote lote : barCode.getLotes()) {
+					quantityInStock+= lote.getCantidad();
+				}
+			}
+			if(quantityInStock < producto.getStockMinimo()) {
+				lowStockProducts.add(producto);
+			}
+		}		
+		return null;
 	}
 
 }

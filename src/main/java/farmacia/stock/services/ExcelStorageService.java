@@ -23,8 +23,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import farmacia.stock.exceptions.storage.StorageException;
+import farmacia.stock.models.dao.ICodigoDeBarraDao;
 import farmacia.stock.models.dao.ILoteDao;
 import farmacia.stock.models.dao.IProductoDao;
+import farmacia.stock.models.entity.CodigoDeBarra;
 import farmacia.stock.models.entity.Lote;
 import farmacia.stock.models.entity.Producto;
 
@@ -39,37 +41,57 @@ public class ExcelStorageService implements IExcelStorageService {
 	}
 
 	@Override
-	public void readExcelFile(IProductoDao productoDao) throws IOException {
+	public void readExcelFile(IProductoDao productoDao, ICodigoDeBarraDao barCodeDao) throws IOException {
 		try(Workbook wb = WorkbookFactory.create(new File(localPath + "/" + fileName));) {
 			
 			Sheet sheet = wb.getSheetAt(0);
 			Row row;
 			Cell cell;
 			Producto producto;
+			CodigoDeBarra barCode;
 			Lote lote;
 		        for (int i  = 4; i < sheet.getLastRowNum();i++) {
 		            producto = new Producto();
+		            barCode = new CodigoDeBarra();
 		            lote = new Lote();
 		            
 		        	row = sheet.getRow(i);
-		            
-		            cell = row.getCell(1); //Codigo de barras
-		            
+		            		            
+		        	cell = row.getCell(0); //Clave PBI
 		            if(!productoDao.existsById(cell.getStringCellValue())) {
 		            	
-		            	producto.setCodigoDeBarras(cell.getStringCellValue().trim());
-		            	
-		            	cell = row.getCell(0); //Clave PBI
 		            	producto.setClavePBI(cell.getStringCellValue().trim());
 		            	
-		            	cell = row.getCell(2); //Descripcion
-		            	producto.setDescripcion(cell.getStringCellValue().trim());
+		            	cell = row.getCell(1); //Codigo de barras
+		            	if(barCodeDao.existsById(cell.getStringCellValue().trim())) {
+		            		barCode = barCodeDao.findById(cell.getStringCellValue().trim()).get();
+		            	}else {
+		            		
+				            barCode.setBarCode(cell.getStringCellValue().trim());
+		            		
+		            		cell = row.getCell(2); //Descripcion
+				            barCode.setDescription(cell.getStringCellValue().trim());
+		            	}
+	
 		            	
 		            	
 		            }else {
 		            	//Obtiene el producto (hay que usar .get dado que es una clase Optional)
 		            	producto = productoDao.findById(cell.getStringCellValue()).get();
+		            	
+		            	cell = row.getCell(1); //Codigo de barras
+		            	if(barCodeDao.existsById(cell.getStringCellValue().trim())) {
+		            		barCode = barCodeDao.findById(cell.getStringCellValue().trim()).get();
+		            	}else {
+		            		
+				            barCode.setBarCode(cell.getStringCellValue().trim());
+		            		
+		            		cell = row.getCell(2); //Descripcion
+				            barCode.setDescription(cell.getStringCellValue().trim());
+		            	}
+		            	
 		            }
+		            
 		            
 		            cell = row.getCell(3); //Lote
 		            lote.setLote(cell.getStringCellValue().trim());
@@ -86,9 +108,11 @@ public class ExcelStorageService implements IExcelStorageService {
 		            cell = row.getCell(7); //Almacen
 		            lote.setAlmacen(cell.getStringCellValue().trim());
 		            
-		            lote.setProducto(producto);
+		            lote.setBarCode(barCode);
+		            barCode.setProducto(producto);
+		            barCode.addLote(lote);
 		            
-		            producto.addLote(lote);
+		            producto.addBarCode(barCode);
 		            productoDao.save(producto);
 		            
 		        }
@@ -131,4 +155,5 @@ public class ExcelStorageService implements IExcelStorageService {
 	public void deleteExcelPath() {
 		FileSystemUtils.deleteRecursively(localPath.toFile());
 	}
+	
 }

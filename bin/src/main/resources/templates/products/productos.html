@@ -60,18 +60,16 @@
 				</tr>
 			</thead>
 			<tbody>
-				<span th:each="Producto : ${Productos}"> 
-				<span th:each="BarCode : ${Producto.barCodes}">
-					<tr th:each="lote : ${BarCode.lotes}">
+				<span th:each="Producto : ${Productos}">
+					<tr th:each="lote : ${Producto.lotes}">
 						<td scope="row" th:text="${Producto.clavePBI}"></td>
-						<td th:text="${BarCode.barCode}"></td>
-						<td th:text="${BarCode.description}"></td>
+						<td th:text="${Producto.codigoDeBarras}"></td>
+						<td th:text="${Producto.descripcion}"></td>
 						<td th:text="${lote.lote}"></td>
 						<td th:text="${lote.fechaCaducidad}"></td>
 						<td class=" text-center" th:text="${lote.cantidad}"></td>
 						<td class=" text-center" th:text="${Producto.stockMinimo}"></td>
 					</tr>
-				</span>
 				</span>
 			</tbody>
 		</table>
