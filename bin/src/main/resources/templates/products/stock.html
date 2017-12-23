@@ -9,25 +9,29 @@
 			class="text-secondary text-center border border-left-0 border-right-0 border-top-0 border-success"
 			th:text="${Titulo}">Productos</h1>
 
-		<form th:action="@{/products/stock/update}" method="post">
+		<form class="mx-auto"  style="width: 80%" th:action="@{/products/stock/update}" method="post">
 			<table
-				class="table table-fit2 table-sm table-striped table-hover mx-auto "
-				style="width: 70%">
+				class="table table-sm table-striped table-hover mx-auto"				
+				>
 				<thead class="thead-dark">
-					<tr>
-						<th class="col-1 text-center" scope="col">#</th>
-						<th class="col-2" scope="col">Clave PBI</th>
-						<th class="col-6" scope="col">Descripci&oacute;n</th>
-						<th class="col-3" scope="col">Stock Minimo</th>
+					<tr class="row">
+						<th class="col-sm-1 text-center" >#</th>
+						<th class="col-sm-2" >Clave PBI</th>
+						<th class="col-sm-7" >Descripci&oacute;n</th>
+						<th class="col-sm-2" >Stock Minimo</th>
 					</tr>
 				</thead>
-				<tbody>
-					<tr th:each="Producto : ${Productos}">
-						<td class="text-center" th:text="${Counter.sumAndGet(1)}"></td>
-						<td th:text="${Producto.clavePBI}"></td>
-						<td th:text="${Producto.descripcion}"></td>
-						<td><input th:name="${Producto.codigoDeBarras}" type="number"
-							th:value="${Producto.stockMinimo}"></td>
+				<tbody>				
+					<tr  class="row" th:each="producto : ${Productos}">
+					<span th:each="barCode : ${producto.barCodes}">
+						<td class="col-sm-1 text-center" th:text="${Counter.sumAndGet(1)}"></td>
+						<td class="col-sm-2" th:text="${producto.clavePBI}"></td>
+						<td class="col-sm-7" th:text="${barCode.description}"></td>
+						<td class="col-sm-2">
+							<input class="form-control" th:name="${barCode.barCode}" type="number"
+							th:value="${producto.stockMinimo}">
+						</td>
+					</span>
 					</tr>
 				</tbody>
 			</table>

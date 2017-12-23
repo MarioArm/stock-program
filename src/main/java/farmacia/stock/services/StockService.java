@@ -18,6 +18,7 @@ import farmacia.stock.models.dao.IProductoDao;
 import farmacia.stock.models.entity.CodigoDeBarra;
 import farmacia.stock.models.entity.Lote;
 import farmacia.stock.models.entity.OrderStockHeader;
+import farmacia.stock.models.entity.OrderStockItem;
 import farmacia.stock.models.entity.Producto;
 
 @Service
@@ -85,18 +86,28 @@ public class StockService implements IStockService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Producto> getAllProductsShortDescription() {
-		List<Producto> productos = (List<Producto>) productoDao.findAll();
-		for (Producto producto : productos) {
-			for(CodigoDeBarra barCode: producto.getBarCodes()) {
-				if (barCode.getDescription().length() > 40) {
-					barCode.setDescription(barCode.getDescription().substring(0, 39));
-				}				
+		List<Producto> allProducts = (List<Producto>) productoDao.findAll();
+		List<Producto> productsToShow = new ArrayList<>();
+		Producto product;
+		for (Producto producto : allProducts) {
+			product = new Producto();
+			if (producto.getBarCodes().get(0).getDescription().length() > 40) {
+				producto.getBarCodes().get(0).setDescription(
+						producto.getBarCodes().get(0).getDescription().substring(0, 39));
 			}
+			product.setClavePBI(producto.getClavePBI());
+			product.setStockMinimo(producto.getStockMinimo());
+			product.addBarCode(producto.getBarCodes().get(0));
+			
+			productsToShow.add(product);
+			
+			product = null;
 		}
-		return productos;
+		return productsToShow;
 	}
 
 	@Override
+	@Transactional(readOnly=true)
 	public Producto findById(String codigoDeBarras) {
 		CodigoDeBarra codigoDelProducto = barCodeDao.findById(codigoDeBarras).get();
 		
@@ -104,25 +115,74 @@ public class StockService implements IStockService {
 	}
 
 	@Override
-	public OrderStockHeader generateOrderToStock() {
+	@Transactional
+	public void generateOrderToStock() {
 		List<Producto> allProducts = (List<Producto>) productoDao.findAll();
-		List<Producto> lowStockProducts = new ArrayList<>();
 		
+		//Set up a stockHeader with fixed data
+		//TODO change fixed data
 		OrderStockHeader stockHeader = new OrderStockHeader();
 		stockHeader.setElaborationDate(Date.from(Instant.now()));
+		stockHeader.setFromWarehouse("Cedis PBI");
+		stockHeader.setToWarehouse("100 Metros");
 		
+		int stockFromDestination, stockFromOrigin;
+		
+		OrderStockItem stockItem;
+		
+		//check up all products for low stock ones
 		for(Producto producto : allProducts) {
-			int quantityInStock = 0;
+			stockFromDestination = 0;
+			stockFromOrigin = 0;
+			
 			for(CodigoDeBarra barCode : producto.getBarCodes()) {
 				for(Lote lote : barCode.getLotes()) {
-					quantityInStock+= lote.getCantidad();
+					//TODO change fixed values from origin, destination
+					if(lote.getAlmacen().trim().equalsIgnoreCase("100 Metros")) {
+						stockFromDestination+= lote.getCantidad();						
+					}else if(lote.getAlmacen().trim().equalsIgnoreCase("Cedis PBI")) {
+						stockFromOrigin+=lote.getCantidad();
+					}
 				}
 			}
-			if(quantityInStock < producto.getStockMinimo()) {
-				lowStockProducts.add(producto);
+			if(stockFromDestination < producto.getStockMinimo() && stockFromOrigin > 0) {
+				stockItem = new OrderStockItem();
+				stockItem.setItemClavePbi(producto.getClavePBI());
+				stockItem.setQuantityInStock(stockFromDestination);
+				
+				int quantityToOrder;
+				//if stockFromOrigin is less or equal than minimum stock minus stockfromDestination get all stockFromOrigin 
+				if(stockFromOrigin <= (producto.getStockMinimo() - stockFromDestination)) {
+					quantityToOrder = stockFromOrigin;
+				}else {
+					quantityToOrder = (producto.getStockMinimo() - stockFromDestination);
+				}
+				
+				stockItem.setQuantityToOrder(quantityToOrder);
+				stockItem.setItemDescription(producto.getBarCodes().get(0).getDescription());
+				stockItem.setidOrderStockHeader(stockHeader);
+				stockHeader.addItem(stockItem);
+				
+				stockItem = null;
 			}
-		}		
-		return null;
+		}
+		
+		stockHeaderDao.save(stockHeader);
+		
+	}
+	
+	@Override
+	@Transactional(readOnly=true)
+	public List<OrderStockHeader> getAllHeaders() {
+		List<OrderStockHeader> orderStockHeaders = new ArrayList<>();
+		orderStockHeaders = (List<OrderStockHeader>) stockHeaderDao.findAll();
+		return orderStockHeaders;
+	}
+
+	@Override
+	public OrderStockHeader findHeaderById(String id) {
+		OrderStockHeader header = stockHeaderDao.findById(Long.valueOf(id)).get();
+		return header;
 	}
 
 }

@@ -52,19 +52,15 @@ public class OrderStockHeader implements Serializable{
 	@Column(name="to_warehouse")
 	private String toWarehouse;
 	
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "order_stock_header")
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "idOrderStockHeader")
 	private List<OrderStockItem> items;
 	
 	public OrderStockHeader(){
 		items = new ArrayList<>();
 	}
-
+	
 	public long getTransactionId() {
 		return transactionId;
-	}
-
-	public void setTransactionId(long transactionId) {
-		this.transactionId = transactionId;
 	}
 
 	public Date getElaborationDate() {

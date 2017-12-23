@@ -44,8 +44,8 @@ public class OrderStockItem implements Serializable{
 	
 	@NotNull
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "transaction_id")
-	private OrderStockHeader orderStockHeader;
+	@JoinColumn(name = "transactionId")
+	private OrderStockHeader idOrderStockHeader;
 	
 	public OrderStockItem() {}
 
@@ -89,12 +89,12 @@ public class OrderStockItem implements Serializable{
 		this.itemClavePbi = itemClavePbi;
 	}
 
-	public OrderStockHeader getOrderStockHeader() {
-		return orderStockHeader;
+	public OrderStockHeader getidOrderStockHeader() {
+		return idOrderStockHeader;
 	}
 
-	public void setOrderStockHeader(OrderStockHeader orderStockHeader) {
-		this.orderStockHeader = orderStockHeader;
+	public void setidOrderStockHeader(OrderStockHeader orderStockHeader) {
+		this.idOrderStockHeader = orderStockHeader;
 	}
 	
 }

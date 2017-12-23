@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/layout :: head"></head>
+<body>
+	<header th:replace="layout/layout :: header"></header>
+	<div class="container">
+		<h1
+			class="text-secondary text-center border border-left-0 border-right-0 border-top-0 border-success"
+			th:text="${Titulo}">Title</h1>
+		<div
+			class="border border-left-0 border-right-0 border-top-0 border-warning">
+			<div>
+				<h4>
+					<Strong>Fecha:</Strong> <span>Fecha de prueba</span>
+				</h4>
+			</div>
+			<div>
+				<strong>Desde: </strong><span>Cedis PBI</span>
+			</div>
+			<div>
+				<strong>Para: </strong><span>100 Metros</span>
+			</div>
+		</div>
+		<div>
+			<table
+				class="table-responsive table table-striped table-bordered table-hover">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Clave PBI</th>
+						<th>Cantidad en stock</th>
+						<th>Cantidad por pedir</th>
+						<th>Descripci&oacute;n</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="Item : ${Cabecera.items}">
+						<td th:text="${Counter.sumAndGet(1)}"></td>
+						<td th:text="${Item.itemClavePbi}"></td>
+						<td th:text="${Item.quantityInStock}"></td>
+						<td th:text="${Item.quantityToOrder}"></td>
+						<td th:text="${Item.itemDescription}"></td>
+					</tr>
+				</tbody>
+			</table>
+
+		</div>
+	</div>
+	<footer th:replace="layout/layout :: footer"></footer>
+</body>
+</html>

@@ -26,5 +26,9 @@ public interface IStockService{
 	
 	public Producto findById(String codigoDeBarras);
 	
-	public OrderStockHeader generateOrderToStock();
+	public void generateOrderToStock();
+	
+	public List<OrderStockHeader> getAllHeaders(); 
+	
+	public OrderStockHeader findHeaderById(String id);
 }

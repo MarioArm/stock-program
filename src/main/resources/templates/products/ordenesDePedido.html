@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/layout :: head"></head>
+<body>
+	<header th:replace="layout/layout :: header"></header>
+	<div class="container">
+		<form action="#" th:action="@{/products/generacionPedido}"
+			method="post">
+			<input class="btn btn-primary btn-lg" type="submit" name="newOrder"
+				value="Crear nueva">
+		</form>
+
+		<h1
+			class="text-secondary text-center border border-left-0 border-right-0 border-top-0 border-success"
+			th:text="${Titulo}">Titulo</h1>
+		<div style="width: 80%" class="mx-auto">
+			<table class="table table-sm table-striped table-hover">
+				<thead class="thead-dark">
+					<tr class="row">
+						<th class="col-sm-1 text-center">#</th>
+						<th class="col-sm-2 text-center" >ID</th>
+						<th class="col-sm-3 text-center" >Fecha de creaci&oacute;n</th>
+						<th class="col-sm-2 text-center" >Desde</th>
+						<th class="col-sm-2 text-center" >Para</th>
+						<th class="col-sm-1 text-center" >Ver</th>
+						<th class="col-sm-1 text-center" >Borrar</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="row" th:each="Cabecera : ${Cabeceras}">
+						<td class="col-sm-1 text-center align-middle" th:text="${Counter.sumAndGet(1)}"></td>
+						<td class="col-sm-2 text-center" th:text="${Cabecera.transactionId}"></td>
+						<td class="col-sm-3 text-center" th:text="${Cabecera.elaborationDate}"></td>
+						<td class="col-sm-2 text-center" th:text="${Cabecera.fromWarehouse}"></td>
+						<td class="col-sm-2 text-center" th:text="${Cabecera.toWarehouse}"></td>
+						<td class="col-sm-1 text-center"><a class="btn btn-sm btn-success"
+							th:href="@{/products/ordenes/{id}(id=${Cabecera.transactionId})}"
+							th:text="Ver"></a></td>
+						<td class="col-sm-1 text-center"><a class="btn btn-sm btn-danger"
+							th:href="@{/products/ordenes/{id}/borrar(id=${Cabecera.transactionId})}"
+							th:text="Borrar"></a></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+
+	<footer th:replace="layout/layout :: footer"></footer>
+</body>
+</html>

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -46,7 +47,7 @@ public class ProductoController {
 
 	@RequestMapping(value = "/products/productos", method = RequestMethod.GET)
 	public String inventoryPage(Model model) {
-		model.addAttribute("Productos", stockService.getAllProducts());
+		model.addAttribute("Productos", stockService.getAllProductsShortDescription());
 		model.addAttribute("Titulo", "Sistema de pedidos");
 		return "products/productos";
 	}
@@ -72,16 +73,20 @@ public class ProductoController {
 	}
 
 	@RequestMapping(value = "/products/stock/update", method = RequestMethod.POST)
-	public String saveStock(@RequestBody String respuestas, Model model) {
+	public String saveStock(@RequestBody String respuestas) {
 		List<ResponseUpdateProduct> listaRespuestas = new ArrayList<ResponseUpdateProduct>();
 		String respuesta[] = respuestas.split("&");
 		for (int i = 0; i < respuesta.length; i++) {
 			String datos[] = respuesta[i].split("=");
+			if(datos[1].isEmpty()) {
+				datos[1]="0";
+			}
+			//System.out.println();
 			listaRespuestas.add(new ResponseUpdateProduct(datos[0], Integer.parseInt(datos[1])));
 		}
 		Producto producto;
 		for (ResponseUpdateProduct response : listaRespuestas) {
-			System.out.println("ID: " + response.getCodigoDeBarras() + " - Cantidad: " + response.getStockMinimo());
+			//System.out.println("ID: " + response.getCodigoDeBarras() + " - Quantity: " + response.getStockMinimo());
 			producto = stockService.findById(response.getCodigoDeBarras());
 			producto.setStockMinimo(response.getStockMinimo());
 
@@ -93,22 +98,29 @@ public class ProductoController {
 	@RequestMapping(value = "/products/generacionPedido", method = RequestMethod.GET)
 	public String generateOrder(Model model) {
 		
-		model.addAttribute("Titulo", "Pedido");
-
-		List<Producto> productosPorMostrar= new ArrayList<Producto>();		
-		List<Producto> productos = stockService.getAllProductsShortDescription();
-		
-		for(Producto producto: productos) {
-//			if(producto.isLowStock() && (producto.cantidadPorSurtir()>0)) {
-//				productosPorMostrar.add(producto);
-//			}
-		}		
-		
-		model.addAttribute("Productos", productosPorMostrar);
+		model.addAttribute("Titulo", "Ordenes de reabastecimiento");		
+		model.addAttribute("Cabeceras", stockService.getAllHeaders());
 		model.addAttribute("Counter", new Counter());
 
-		//return "products/generacionPedido";
-		return "redirect:/";
+		return "products/ordenesDePedido";		
+	}
+	
+	@RequestMapping(value = "/products/generacionPedido", method = RequestMethod.POST)
+	public String generateOrder() {
+		
+		stockService.generateOrderToStock();
+
+		return "redirect:/products/generacionPedido";		
+	}
+	
+	@RequestMapping(value = "/products/ordenes/{idFromOrderHeader}")
+	public String viewOrder(@PathVariable(value="idFromOrderHeader") String idHeader, Model model) {
+		
+		model.addAttribute("Titulo", "ID Pedido: " + idHeader);
+		model.addAttribute("Cabecera",stockService.findHeaderById(idHeader));
+		model.addAttribute("Counter", new Counter());
+		
+		return "products/vistaDePedido";
 	}
 	
 
