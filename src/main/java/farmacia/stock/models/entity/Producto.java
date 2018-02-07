@@ -32,7 +32,7 @@ public class Producto implements Serializable {
 	private String clavePBI;
 
 	@Column(name = "stock_minimo")
-	private int stockMinimo;
+	private int stockMinimo = 0;
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "producto")
 	private List<CodigoDeBarra> barCodes;

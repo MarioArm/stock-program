@@ -6,14 +6,14 @@
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
 	integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb"
 	crossorigin="anonymous" />
-<link rel="stylesheet" th:href="@{css/style.css}">
+<link rel="stylesheet" th:href="@{/css/style.css}">
 <title th:text="${Titulo}">Insert title here</title>
 </head>
 <body>
 	<header th:fragment="header" class="pb-3">
 		<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 			<a class="navbar-brand px-2" href="#"><img alt=""
-				th:src="@{images/clippy.svg}"
+				th:src="@{/images/clippy.svg}"
 				style="width: 10%; display: inline-block; vertical-align: text-top">Sistema
 				de pedidos</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse"
@@ -23,12 +23,16 @@
 			</button>
 			<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
 				<div class="navbar-nav">
-					<a class="nav-item nav-link active" th:href="@{/}"> Home <span
-						class="sr-only">(current)</span></a> <a class="nav-item nav-link"
-						th:href="@{/products/productos}">Productos</a> <a
-						class="nav-item nav-link" th:href="@{/products/stock}">Capturar
-						Stock</a> <a class="nav-item nav-link" th:href="@{/products/generacionPedido}">Generar
-						Pedido</a>
+					<div>
+						<a class="nav-item nav-link" th:href="@{/products/productos}">Productos</a>
+					</div>
+					<div>
+						<a class="nav-item nav-link" th:href="@{/products/stock}">Stock M&iacute;nimo</a>
+					</div>
+					<div>
+						<a class="nav-item nav-link"
+							th:href="@{/products/generacionPedido}">Generar Pedido</a>
+					</div>
 
 				</div>
 			</div>
@@ -36,8 +40,8 @@
 	</header>
 
 	<footer th:fragment="footer">
-	
-	<div class="mb-5"></div>
+
+		<div class="mb-5"></div>
 
 		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
 			integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"

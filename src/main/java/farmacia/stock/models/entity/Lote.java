@@ -53,6 +53,7 @@ public class Lote implements Serializable {
 		
 	}
 
+
 	public long getId() {
 		return id;
 	}

@@ -37,15 +37,8 @@ public class ProductoController {
 	@Autowired
 	private StockService stockService;
 
-	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String rootPage(Model model) {
 
-		model.addAttribute("Titulo", "Sistema de pedidos");
-
-		return "index";
-	}
-
-	@RequestMapping(value = "/products/productos", method = RequestMethod.GET)
+	@RequestMapping(value = {"/","/products/productos"}, method = RequestMethod.GET)
 	public String inventoryPage(Model model) {
 		model.addAttribute("Productos", stockService.getAllProductsShortDescription());
 		model.addAttribute("Titulo", "Sistema de pedidos");
